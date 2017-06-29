@@ -1,8 +1,11 @@
 %This script tests function "writeAdibinFromSignal" which creates an
 %.adibin file from signal in Matlab format.
 
+%change path to folder containing this function, and
+%writeAdibinFromSignal.m and catpad.m
 addpath('C:\cygwin64\home\mma\E4Data\');
 
+%Change this path to the folder contain the unzipped E4 files
 inputPath = 'C:\cygwin64\home\mma\E4Data\device_data\';
 
 d = dir(inputPath);
@@ -15,12 +18,19 @@ for i=1:numel(inputDirArray)
 end
 
 function generateAdibin (dir)
+
+    %Here is a path to an unzipped E4 folder within the folder of E4 data,
+    %so change this to match input path
     filePath = strcat('C:\cygwin64\home\mma\E4Data\device_data\', dir,'\');
 
+    %The path should be to a folder that you want to store the adibin files
     outputPath = strcat('C:\cygwin64\home\mma\E4Data\output_data\', dir);
 
+    %The adibin created has the same name as the E4 unzipped folder
     outputFileName = strcat(outputPath, '.adibin');
 
+    %An array is read from each E4 .csv to generate a channel in the
+    %LabChart
     bvpArray = csvread(strcat(filePath, 'BVP.csv'));
         timeStamp = bvpArray(1,1);
         t = datetime(timeStamp , 'ConvertFrom','posixtime');
@@ -28,6 +38,8 @@ function generateAdibin (dir)
         fs = bvpArray(2,1);
         dataBvpArray = bvpArray(3:end, 1);
     
+    %these are used to upsample channels to match the bvp which has the
+    %highest sample rate.
     sampleSize = length(dataBvpArray);
     halfSize = ceil(sampleSize/2);
     sixteenthSize = ceil(sampleSize/16);
@@ -103,7 +115,8 @@ function generateAdibin (dir)
 
     %load the signal
     signal=concatArray';
-
+    
+    %Write channel arrays to binary file at outputFileNamess
     writeAdibinFromSignal(outputFileName, fs, dateVec, chanTitle, UnitsName, signal);
     
 end
